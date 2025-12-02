@@ -9,8 +9,8 @@ services:
     volumes:
       - ./backend:/app
       - ./backend/chroma_db:/app/chroma_db
-    environment:
-      - GOOGLE_API_KEY=AIzaSyBaGz0l5rl4gPVd4zCgfizlrNa1H_F0z3I
+    env_file:
+      - .env
     command: uvicorn main:app --host 0.0.0.0 --port 8000 --reload
 
   frontend:
@@ -25,3 +25,12 @@ services:
     tty: true
     depends_on:
       - backend
+
+  data-pipeline:
+    build: ./data_pipeline
+    container_name: xtock-pipeline
+    volumes:
+      - ./data_pipeline:/app
+      - ./backend/chroma_db:/app/chroma_db 
+    env_file:
+      - .env
