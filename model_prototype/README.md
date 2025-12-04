@@ -17,3 +17,13 @@ GOOGLE_API_KEY=(본인의 GOOGLE_API_KEY value)를 넣고 저장
 이때 sp500_full_wiki.jsonl 파일이 생성된 후에 pipeline.py 코드를 실행하면 sp500_sbert_input.jsonl 파일이 생성
 - 파일이 모두 생성됐으면 파일이 제대로 생성됐는지 확인 후 build_vector.py 코드를 실행 (실행 코드는 "docker exec -it xtock-pipeline python build_vector.py)
 - backend 폴더에 chroma_db 폴더가 생성된 것을 확인 후에 test_hybrid_search.py 코드를 실행하면 test tweet을 기반으로 유사도가 높은 top3 기업을 출력(실행 코드는 "docker exec -it xtock-backend python test_hybrid_search.py)
+
+
+- 벤치 마크 모델을 추가
+  - SBERT 모델 중 MiniLM 모델과 BGE-M3 모델의 성능을 비교
+  - Ai Studio를 활용해서 AI의 도움을 받을 경우와 받지 않을 경우의 성능을 비교
+  - AI만 사용했을 때의 모델도 추가하여 섣능을 비교
+  - * AI의 temperature를 0.0으로 설정하여 항상 같은 결과값이 나오도록 고정, 프롬프트는 동일하게 사용
+  - 최초 성능은 SBERT 모델과 제미나이를 합친 모델의 성능이 가장 우수한 것으로 확인
+  - 벤치마크를 위한 트윗의 난이도를 점점 올려가면서 시도한 결과 가장 성능이 우수한 모델은 BGE 모델과 제미나이를 합친 모델의 성능이 가장 우수한 것으로 확인
+  - <img width="445" height="208" alt="image" src="https://github.com/user-attachments/assets/454d1a9a-3a93-4dd9-91a5-7873882c9a9d" />
