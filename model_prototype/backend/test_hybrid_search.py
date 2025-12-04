@@ -46,13 +46,7 @@ def ask_gemini_for_context(tweet_text):
     except Exception as e:
         print(f" Gemini API Error: {e}")
         return ""
-    
-def analyze_sentiment(text):
-    try:
-        res = finbert_model(text[:512])[0]
-        return {"label": res['label'], "score": round(res['score'], 4)}
-    except:
-        return {"label": "neutral", "score": 0.0}
+
     
 def hybrid_search(tweet_text):
     ai_context = ask_gemini_for_context(tweet_text)
@@ -62,8 +56,6 @@ def hybrid_search(tweet_text):
         expanded_query = f"{ai_context} {tweet_text}"
     else:
         expanded_query = tweet_text
-        
-    sentiment_result = analyze_sentiment(tweet_text)
         
     query_vector = sbert_model.encode(expanded_query).tolist()
     
@@ -86,7 +78,6 @@ def hybrid_search(tweet_text):
             
     return {
             "input_text": tweet_text,
-            "sentiment": sentiment_result,
             "matches": top_companies
         }
 
@@ -105,11 +96,8 @@ if __name__ == "__main__":
         
         if not matches:
             print("No matches found.")
-        else:
-            sent = matches['sentiment']
-            print(f"Sentiment: [{sent['label'].upper()}] (Score: {sent['score']})")
-            
+        else:            
             print(f"Matched Companies: ")
             for m in matches['matches']:
-                print(f" -{m['ticker']} ({m['name']})")
+                print(f" -{m['ticker']} ({m['name']}) Score: {m['score']:.2f}")
         print("\n")
