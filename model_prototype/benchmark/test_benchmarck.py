@@ -36,7 +36,6 @@ reranker = CrossEncoder('cross-encoder/ms-marco-MiniLM-L-6-v2')
 def ask_gemini_analysis(tweet):
     if not GOOGLE_API_KEY: return ""
     
-    # [업그레이드] 은어/별명 예시를 프롬프트에 추가 (Few-Shot)
     prompt = f"""
     You are a financial slang expert. Identify the company ticker related to this tweet.
     
