@@ -11,7 +11,7 @@ from nltk.corpus import stopwords
 
 wikipedia.set_lang("en")
 
-kw_model = KeyBERT(model = 'all-MiniLM-L6-v2')
+kw_model = KeyBERT(model = 'BAAI/bge-m3')
 
 nltk.download('stopwords')
 stop_words = stopwords.words('english')
@@ -113,10 +113,16 @@ if __name__ == "__main__":
     df['Status'] = df['Status'].astype(str).str.strip()
     
     final_data = []
+
+    seen_companies = set()
     
     for idx, row in tqdm(df.iterrows(), total = len(df)):
         ticker = row['Ticker']
         name = row['Name']
+        normalized_name = clean_company_name(name)
+        if normalized_name in seen_companies:
+            continue
+        seen_companies.add(normalized_name)
         status = row['Status']
         wiki_text = row.get('Full_Wiki_Text', "")
         
