@@ -17,12 +17,18 @@ def get_financial_narrative(ticker, name):
         industry = info.get('industry', 'Unknwon Industry')
 
         financials = stock.financials
-        if financials.empty: return "Empty"
+        if financials.empty: return "", "Unknown"
+        
+        latest_date = financials.columns[0]
+        latest_net_income = financials.loc['Net Income', latest_date] if 'Net Income' in financials.index else 0
+        
+        status_tag = "Profit" if latest_net_income > 0 else "Loss"
         
         years = financials.columns[:4]
         narrative_parts = []
         
-        narrative_parts.append(f"Financial Report for {name} ({ticker}). Sector: {sector}. Industry: {industry}")
+        header = f"Financial Report for {name} ({ticker}). Sector: {sector}. Industry: {industry}"
+        narrative_parts.append(header)
         
         for date in years:
             year = date.year
@@ -44,8 +50,9 @@ def get_financial_narrative(ticker, name):
                 
             except KeyError:
                 continue
-
-        return " ".join(narrative_parts)
+        full_text = " ".join(narrative_parts)
+        
+        return full_text, status_tag
     
     except Exception as e:
         return ""
@@ -60,13 +67,14 @@ if __name__ == "__main__":
         ticker = row['Ticker']
         name = row['Name']
         
-        fin_text = get_financial_narrative(ticker, name)
+        fin_text, status = get_financial_narrative(ticker, name)
         
         if fin_text:
             financial_data.append({
                 "Ticker": ticker,
                 "Name": name,
-                "Financial_Text": fin_text
+                "Financial_Text": fin_text,
+                "Latest_Status": status
             })
             
         time.sleep(0.1)
