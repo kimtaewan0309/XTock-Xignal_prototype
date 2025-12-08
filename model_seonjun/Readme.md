@@ -1,4 +1,5 @@
 모델 확인 방법
+
 python analysis.py --mode "train"
 
 python analysis.py --mode "text" --text-file "test/tsla.txt"
