@@ -27,10 +27,21 @@ services:
       - backend
 
   data-pipeline:
-    build: ./data_pipeline
+    build:
+      context: ./data_pipeline
+      dockerfile: Dockerfile
     container_name: xtock-pipeline
     volumes:
-      - ./data_pipeline:/app
-      - ./backend/chroma_db:/app/chroma_db 
+      - ./:/app
     env_file:
       - .env
+    ports:
+      - "8001:8000"
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: 1
+              capabilities: [gpu]
+              
