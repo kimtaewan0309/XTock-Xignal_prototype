@@ -44,4 +44,16 @@ services:
             - driver: nvidia
               count: 1
               capabilities: [gpu]
-              
+
+  mongo-db:
+    image: mongo:latest
+    container_name: xtock-mongodb
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongo_data:/data/db
+    networks:
+      - default
+
+volumes:
+  mongo_data:           

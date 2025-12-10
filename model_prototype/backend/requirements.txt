@@ -2,21 +2,16 @@
 fastapi
 uvicorn
 requests
+pydantic
+pymongo
+python-dotenv
+httpx
 # 데이터 처리 및 AI 용
 pandas
 numpy
+yfinance
 chromadb
 sentence-transformers
-keybert
-google-generativeai
 torch
-torchvision
-torchaudio
-tqdm
-nltk
 optuna
-# 크롤링 용
-wikipedia
-yfinance
-lxml
-html5lib
+tqdm

@@ -1,15 +1,11 @@
-import nltk
-from nltk.corpus import stopwords
 
+# 1. NLTK 의존성 제거 -> 하드코딩된 불용어 리스트 사용
+NLTK_STOPWORDS = {
+    'i', 'me', 'my', 'myself', 'we', 'our', 'ours', 'ourselves', 'you', "you're", "you've", "you'll", "you'd", 'your', 'yours', 'yourself', 'yourselves', 'he', 'him', 'his', 'himself', 'she', "she's", 'her', 'hers', 'herself', 'it', "it's", 'its', 'itself', 'they', 'them', 'their', 'theirs', 'themselves', 'what', 'which', 'who', 'whom', 'this', 'that', "that'll", 'these', 'those', 'am', 'is', 'are', 'was', 'were', 'be', 'been', 'being', 'have', 'has', 'had', 'having', 'do', 'does', 'did', 'doing', 'a', 'an', 'the', 'and', 'but', 'if', 'or', 'because', 'as', 'until', 'while', 'of', 'at', 'by', 'for', 'with', 'about', 'against', 'between', 'into', 'through', 'during', 'before', 'after', 'above', 'below', 'to', 'from', 'up', 'down', 'in', 'out', 'on', 'off', 'over', 'under', 'again', 'further', 'then', 'once', 'here', 'there', 'when', 'where', 'why', 'how', 'all', 'any', 'both', 'each', 'few', 'more', 'most', 'other', 'some', 'such', 'no', 'nor', 'not', 'only', 'own', 'same', 'so', 'than', 'too', 'very', 's', 't', 'can', 'will', 'just', 'don', "don't", 'should', "should've", 'now', 'd', 'll', 'm', 'o', 're', 've', 'y', 'ain', 'aren', "aren't", 'couldn', "couldn't", 'didn', "didn't", 'doesn', "doesn't", 'hadn', "hadn't", 'hasn', "hasn't", 'haven', "haven't", 'isn', "isn't", 'ma', 'mightn', "mightn't", 'mustn', "mustn't", 'needn', "needn't", 'shan', "shan't", 'shouldn', "shouldn't", 'wasn', "wasn't", 'weren', "weren't", 'won', "won't", 'wouldn', "wouldn't"
+}
 
-# 1. NLTK 불용어 설정
-try:
-    nltk.data.find('corpus/stopwords')
-except LookupError:
-    nltk.download('stopwords')
-    
-# 기본 불용어 집합
-STOPWORDS = set(stopwords.words('english'))
+# 기본 불용어 집합 설정
+STOPWORDS = set(NLTK_STOPWORDS)
 
 # 불용어에서 제외할 티커 목록
 TICKER_STOPWORDS_EXCEPTION = {'it', 'on', 'be', 'do', 'no', 'up', 'all', 'a', 'can', 'or', 'so', 'key'}
@@ -23,8 +19,7 @@ BUSINESS_STOPWORDS ={
 }
 STOPWORDS.update(BUSINESS_STOPWORDS)
 
-# 2. 기업 별칭
-# iphone을 검색 시에 AAPL이 나오도록 만들어줌
+# 2. 기업 별칭 (검색 정확도 핵심)
 ALIASES = {
     # Big Tech
     "AAPL": ["apple", "iphone", "ipad", "macbook", "ios", "vision pro", "tim cook"],
@@ -36,14 +31,14 @@ ALIASES = {
     "TSLA":  ["tesla", "cybertruck", "optimus", "model 3", "model y", "elon musk", "spacex"],
     "NVDA":  ["nvidia", "geforce", "rtx", "h100", "blackwell", "jensen huang", "cuda"],
     
-    # Ambiguous Tickers 보완 (티커가 흔한 단어일 때 별칭이 있으면 확실함)
+    # Ambiguous Tickers 보완
     "ALL": ["allstate", "allstate insurance"],
     "O":   ["realty income", "monthly dividend company"],
     "IT":  ["gartner"],
     "SO":  ["southern company"],
     "A":   ["agilent", "agilent technologies"],
     
-    # Finance / Others (필요한 만큼 추가 가능)
+    # Finance / Others
     "JPM": ["jpmorgan", "jamie dimon", "chase bank"],
     "BRK.B": ["berkshire hathaway", "warren buffett", "charlie munger"],
     "LLY": ["eli lilly", "mounjaro", "zepbound"],
@@ -57,15 +52,12 @@ ALIASES = {
 }
 
 # 3. Ambiguous Tickers
-# 일반 문장에서 자주 사용되는 단어가 티커인 경우
-# $ 표시, 별칭, AI가 확실하게 인식할 때만 검색 대상으로 설정
 AMBIGUOUS_TICKERS = {
     "ALL", "O", "A", "IT", "ON", "SO", "NOW", "ARE", "CAN", "WELL", "OR", "BE", "KEY", "PH"
 }
 
 # 4. Wikipedia 검색용 수동 매핑
 MANUAL_MAPPING = {
-    # [한 글자 티커]
     "O": "Realty Income",
     "T": "AT&T",
     "C": "Citigroup",
@@ -76,8 +68,6 @@ MANUAL_MAPPING = {
     "D": "Dominion Energy",
     "E": "Eni",
     "K": "Kellogg Company",
-    
-    # [일반 명사 티커]
     "ALL": "Allstate",
     "KEY": "KeyCorp",
     "PH":  "Parker Hannifin",
@@ -96,8 +86,6 @@ MANUAL_MAPPING = {
     "TJX": "TJX Companies",
     "UPS": "United Parcel Service",
     "WM":  "Waste Management (corporation)",
-    
-    # [동음이의어 / 모호한 이름]
     "GOOG": "Alphabet Inc.",
     "GOOGL": "Alphabet Inc.",
     "AMZN": "Amazon (company)",
@@ -106,8 +94,6 @@ MANUAL_MAPPING = {
     "META": "Meta Platforms",
     "TSLA": "Tesla, Inc.",
     "NVDA": "Nvidia",
-    
-    # [최근 변경 / 특수 케이스]
     "PODD": "Insulet", 
     "BF-B": "Brown-Forman", 
     "BRK-B": "Berkshire Hathaway", 
@@ -116,10 +102,8 @@ MANUAL_MAPPING = {
     "GEHC": "GE HealthCare"
 }
 
-# 5. 일반적인 푀사 키워드
-# KeyBERT가 추출한 키워드 중 너무 뻔한 단어는 점수 계산에서 제외
+# 5. 일반적인 회사 키워드
 GENERIC_KEYWORDS = {
-    # [1] 비즈니스 일반 명사
     "tech", "technology", "technologies", "software", "hardware", "system", "systems", 
     "group", "global", "international", "service", "services", "solution", "solutions", 
     "company", "companies", "corp", "corporation", "holding", "holdings", 
@@ -128,27 +112,21 @@ GENERIC_KEYWORDS = {
     "subsidiaries", "subsidiary", "listed", "public", "private", "conglomerate",
     "component", "components", "index", "indices", "stock", "market", "nasdaq", "nyse",
     "role", "filled", "became", "become", "based", "located", "place",
-    
-    # [2] 부정적 / 법적 / 뉴스성 키워드 (노이즈)
-    "history", "founded", "founder", "established", "incorporated", # 역사
-    "lawsuit", "sued", "legal", "settlement", "alleged", "accused", "violation", "investigation", # 소송
-    "controversy", "controversies", "ethical", "criticized", "criticism", "faced", "facing", # 논란
-    "bankruptcy", "bankrupt", "debt", "stolen", "seized", "account", # 파산/범죄
-    "termination", "terminated", "layoff", "layoffs", "mass", "fired", "resignation", # 해고
-    "antitrust", "monopoly", "fine", "fined", "penalty", "judge", "court", # 독과점
-    "uber", "russia", "china", "eu", "european", "commission", # 특정 국가/경쟁사 이슈
-    
-    # [3] 무의미한 수식어
+    "history", "founded", "founder", "established", "incorporated",
+    "lawsuit", "sued", "legal", "settlement", "alleged", "accused", "violation", "investigation",
+    "controversy", "controversies", "ethical", "criticized", "criticism", "faced", "facing",
+    "bankruptcy", "bankrupt", "debt", "stolen", "seized", "account",
+    "termination", "terminated", "layoff", "layoffs", "mass", "fired", "resignation",
+    "antitrust", "monopoly", "fine", "fined", "penalty", "judge", "court",
+    "uber", "russia", "china", "eu", "european", "commission",
     "largest", "biggest", "world", "major", "widely", "described", "numerous", "various",
     "united", "states", "american", "california", "york", "mountain", "view", 
     "million", "billion", "trillion", "revenue", "profit", "income", "year", "years",
     "ceo", "announced", "appointed", "member", "board", "executive", "officer",
     "january", "february", "march", "april", "may", "june", "july", "august", "september", "october", "november", "december",
-    
     "law", "actions", "action", "discovered", "access", "self", "greater", 
     "multiple", "large", "cap", "products", "services", "solutions", "platforms",
     "customer", "customers", "operations", "operate", "operating", "segment",
     "also", "include", "includes", "including", "related", "various", "involved",
     "based", "tools", "internet", "digital", "content", "devices", "apps"
-
 }
