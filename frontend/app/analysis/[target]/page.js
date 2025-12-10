@@ -17,12 +17,12 @@ export default function AnalysisPage() {
     }
   }
 
- // ⭐ 실제 데이터 상태
+ // 실제 데이터 상태
 const [tweets, setTweets] = useState([]);
 const [loading, setLoading] = useState(true);
 const [error, setError] = useState(null);
 
-// ⭐ API 요청 실행
+// API 요청 실행
 useEffect(() => {
   if (!target) return;
 
