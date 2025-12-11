@@ -9,14 +9,16 @@ import {
   Menu,
   X,
   BookOpen,
+  Activity,
+  History,
 } from "lucide-react";
 
 import DashboardSection from "@/components/DashboardSection";
+import RecentStatusSection from "@/components/RecentStatusSection";
+import HistoricalImpactSection from "@/components/HistoricalImpactSection";
 import LearningCenter from "@/components/LearningCenter";
 import PortfolioSection from "@/components/PortfolioSection";
-import SearchSection from "@/components/SearchSection";
 import SettingsSection from "@/components/SettingsSection";
-import ThemeProvider from "@/components/ThemeProvider";
 
 // API 유틸리티 import
 import api from "../utils/api";
@@ -24,9 +26,6 @@ import api from "../utils/api";
 export default function Home() {
   const [activeMenu, setActiveMenu] = useState("dashboard");
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
-  const [searchQuery, setSearchQuery] = useState("");
-  const [isLoading, setIsLoading] = useState(false);
-  const [analysisResult, setAnalysisResult] = useState(null);
 
   const [todayDate, setTodayDate] = useState("");
 
@@ -149,7 +148,8 @@ export default function Home() {
 
   const menuItems = [
     { id: "dashboard", icon: LayoutDashboard, label: "대시보드" },
-    { id: "search", icon: SearchIcon, label: "종목 분석" },
+    { id: "recent", icon: Activity, label: "최근 기업 근황" },
+    { id: "historical", icon: History, label: "과거 영향 분석" },
     { id: "learn", icon: BookOpen, label: "학습 센터" },
     { id: "portfolio", icon: User, label: "내 포트폴리오" },
     { id: "settings", icon: Settings, label: "설정" },
@@ -234,7 +234,8 @@ export default function Home() {
             <div className="flex items-center justify-between mb-2">
               <h1 className="text-3xl md:text-4xl font-extrabold">
                 {activeMenu === "dashboard" && "메인 대시보드"}
-                {activeMenu === "search" && "종목 분석"}
+                {activeMenu === "recent" && "최근 기업 근황"}
+                {activeMenu === "historical" && "과거 영향 분석"}
                 {activeMenu === "learn" && "학습 센터"}
                 {activeMenu === "portfolio" && "내 포트폴리오"}
                 {activeMenu === "settings" && "설정"}
@@ -245,7 +246,8 @@ export default function Home() {
             </div>
             <p className="text-sm md:text-base text-slate-400">
               {activeMenu === "dashboard" && "오늘의 시장 동향 및 예측 요약"}
-              {activeMenu === "search" && "기업 및 인물의 온라인 반응과 주가 변동 함께 분석"}
+              {activeMenu === "recent" && "관심 기업의 실시간 공식 트윗과 주가 흐름 모니터링"}
+              {activeMenu === "historical" && "과거 주가에 영향을 미쳤던 결정적 트윗 학습"}
               {activeMenu === "learn" && "주식 기초, 기술적·기본적 분석, AI 기반 투자 학습"}
               {activeMenu === "portfolio" && "나의 관심 종목 및 포트폴리오 관리"}
               {activeMenu === "settings" && "앱 설정 및 개인화"}
@@ -255,14 +257,9 @@ export default function Home() {
           {/* 메뉴별 컨텐츠 */}
           {activeMenu === "dashboard" && <DashboardSection />}
 
-          {activeMenu === "search" && (
-            <SearchSection
-              searchQuery={searchQuery}
-              isLoading={isLoading}
-              analysisResult={analysisResult}
-              onSearch={handleSearch}
-            />
-          )}
+          {activeMenu === "recent" && <RecentStatusSection />}
+
+          {activeMenu === "historical" && <HistoricalImpactSection />}
 
           {activeMenu === "learn" && <LearningCenter />}
 
