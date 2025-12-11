@@ -107,6 +107,7 @@ GOOGLE_API_KEY=(본인의 GOOGLE_API_KEY value)를 넣고 저장
 ## 서버 띄우는 방법
 - Docker Container 필수
 - 백엔드와 프론트엔드에서 사용되는 모든 json, csv, chromaDB 등등 용량 문제로 깃허브에 올라가지 않은 파일들은 공유해드린 구글 드라이브에서 동일한 폴더에 넣고 사용하시면 됩니다.
+- **만약 PC에 GPU가 없는 경우에 'docker-compose.yml' 파일 내에 service: backend 부분에 deploy: 에 해당하는 모든 부분들을 주석처리해야합니다.**
 - Docker Container 설치 후 VSCode에서 XTock-Xignal_prototype 폴더를 연 후
   ```
   cd model_prototype
