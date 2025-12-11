@@ -92,11 +92,11 @@ class SearchEngine:
                 res_dyn = self.col_dynamic.get(ids=[ticker], include=['embeddings', 'metadatas'])
                 
                 # 메타데이터 확보
-                if res_dyn['metadatas'] and len(res_dyn['metadatas']) > 0:
+                if res_dyn['metadatas'] is not None and len(res_dyn['metadatas']) > 0:
                     dyn_meta = res_dyn['metadatas'][0]
 
                 # 임베딩 확보
-                if res_dyn['embeddings'] and len(res_dyn['embeddings']) > 0:
+                if res_dyn['embeddings'] is not None and len(res_dyn['embeddings']) > 0:
                     vec_dyn = np.array(res_dyn['embeddings'][0])
                     
             except Exception as e:
@@ -106,8 +106,10 @@ class SearchEngine:
             mention_score = self.detect_mention_score(query_text, ticker) * self.lambda_mention
             final_score = self.calculate_score(query_vec, vec_static, vec_dyn, mention_score)
             
+            real_symbol = metadatas[i].get('symbol', ticker)
+                        
             candidates.append({
-                "symbol": ticker,  # 프론트엔드 통일성을 위해 ticker -> symbol
+                "symbol": real_symbol,  # 프론트엔드 통일성을 위해 ticker -> symbol
                 "name": metadatas[i].get('name', ''),
                 "score": float(final_score),
                 "keywords": metadatas[i].get('keywords', ''),
