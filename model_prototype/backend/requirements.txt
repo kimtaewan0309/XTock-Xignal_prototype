@@ -1,0 +1,17 @@
+# 서버 구동용
+fastapi
+uvicorn
+requests
+pydantic
+pymongo
+python-dotenv
+httpx
+# 데이터 처리 및 AI 용
+pandas
+numpy
+yfinance
+chromadb
+sentence-transformers
+torch
+optuna
+tqdm
