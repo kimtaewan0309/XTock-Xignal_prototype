@@ -11,8 +11,10 @@ import {
   BookOpen,
   Activity,
   History,
+  LogOut // [추가] 로그아웃 아이콘
 } from "lucide-react";
 
+import LoginPage from "@/components/LoginPage";
 import DashboardSection from "@/components/DashboardSection";
 import RecentStatusSection from "@/components/RecentStatusSection";
 import HistoricalImpactSection from "@/components/HistoricalImpactSection";
@@ -24,10 +26,17 @@ import SettingsSection from "@/components/SettingsSection";
 import api from "../utils/api";
 
 export default function Home() {
+  // [수정] 로그인 상태 관리 (기본값 null)
+  const [user, setUser] = useState(null); 
+  
   const [activeMenu, setActiveMenu] = useState("dashboard");
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
-
   const [todayDate, setTodayDate] = useState("");
+
+  // [추가] 검색 관련 상태 (handleSearch에서 사용됨)
+  const [searchQuery, setSearchQuery] = useState("");
+  const [isLoading, setIsLoading] = useState(false);
+  const [analysisResult, setAnalysisResult] = useState(null);
 
   useEffect(() => {
     setTodayDate(new Date().toLocaleDateString("ko-KR", {
@@ -38,41 +47,35 @@ export default function Home() {
     }));
   }, []);
 
+  // [추가] 로그인이 안 되어 있으면 로그인 페이지를 먼저 보여줌
+  if (!user) {
+    return <LoginPage onLogin={(userData) => setUser(userData)} />;
+  }
+
   const handleSearch = async (query) => {
     setSearchQuery(query);
     setIsLoading(true);
     setAnalysisResult(null);
-      /*
-    const handleSearch = (query) => {
-      console.log("검색:", query);
-      // 실제로는 router.push(`/analysis/${encodeURIComponent(query)}`);
-      alert(`검색 쿼리: ${query}`);
-    };
-    */
-  try {
+    
+    try {
       console.log(`Searching for: ${query}`);
       
-      // 1. 백엔드 호출 (이제 이거 하나면 끝!)
       const res = await api.post("/api/match-company", { text: query });
       
-      // 2. 결과 확인
       if (!res.data.matches || res.data.matches.length === 0) {
         alert("관련된 과거 분석 사례를 찾을 수 없습니다.");
         setIsLoading(false);
         return;
       }
 
-      // 3. 데이터 매핑 (Backend -> Frontend)
-      // 백엔드가 이미 { tweet, stockData, postIndex }를 다 묶어서 줌
       const data = res.data.matches[0]; 
-
       console.log("Received Data:", data);
 
       setAnalysisResult({
-        tweet: data.tweet,       // 트윗 정보
-        stockData: data.stockData, // 차트 데이터
-        postIndex: data.postIndex,    // 트윗 시점 인덱스
-        companyInfo: {           // 기업/사건 요약 정보
+        tweet: data.tweet,
+        stockData: data.stockData,
+        postIndex: data.postIndex,
+        companyInfo: {
             name: data.name,
             financial_summary: data.financial_summary
         }
@@ -85,66 +88,6 @@ export default function Home() {
       setIsLoading(false);
     }
   };
-
-    // 더미 데이터
-  //   setTimeout(() => {
-  //     const isPositive = Math.random() > 0.5;
-
-  //     const mockTweet = {
-  //       author: "김가천",
-  //       handle: "kimgc",
-  //       time: "2시간 전",
-  //       text: isPositive
-  //         ? `${query}의 최근 실적이 시장 예상치를 넘어 투자자들의 관심이 집중되고 있습니다. 특히 신규 사업 부문의 성장세가 가팔라지고 있으며, 기존 핵심 사업에서도 안정적인 매출이 이어지고 있습니다. 또한 글로벌 시장 수요가 점차 회복되고 있어 향후 분기 실적에 대한 기대감도 높아지는 상황입니다.`
-  //         : `${query}에 대한 시장의 우려가 커지고 있습니다. 핵심 사업 부문에서 경쟁 심화로 인해 수익성이 둔화되고 있습니다. 또한 글로벌 경기의 영향으로 수요 회복 속도도 예상보다 더딘 모습입니다. 단기적으로 변동성이 확대될 가능성이 높아 투자자들은 보수적인 접근이 필요하다는 의견이 많습니다.`,
-  //       sentiment: isPositive ? "Positive" : "Negative",
-  //       score: isPositive
-  //         ? 0.85 + Math.random() * 0.15
-  //         : 0.65 + Math.random() * 0.25,
-  //     };
-
-  //     const basePrice = 50000 + Math.random() * 50000;
-  //     const stockData = [];
-  //     const postIndex = 7;
-
-  //     for (let i = 0; i < 15; i++) {
-  //       let price;
-  //       let change;
-
-  //       if (i < postIndex) {
-  //         const variation = (Math.random() - 0.5) * 0.02;
-  //         price = basePrice * (1 + variation * (i / postIndex));
-  //         change = variation * 100;
-  //       } else if (i === postIndex) {
-  //         price = basePrice;
-  //         change = 0;
-  //       } else {
-  //         const daysSincePost = i - postIndex;
-  //         const trendStrength = isPositive ? 0.03 : -0.025;
-  //         const variation = (Math.random() - 0.5) * 0.015;
-  //         price = basePrice * (1 + trendStrength * daysSincePost + variation);
-  //         change = ((price - basePrice) / basePrice) * 100;
-  //       }
-
-  //       const date = new Date();
-  //       date.setDate(date.getDate() - (14 - i));
-
-  //       stockData.push({
-  //         date: `${date.getMonth() + 1}/${date.getDate()}`,
-  //         price: Math.round(price),
-  //         change: parseFloat(change.toFixed(2)),
-  //       });
-  //     }
-
-  //     setAnalysisResult({
-  //       tweet: mockTweet,
-  //       stockData,
-  //       postIndex,
-  //     });
-
-  //     setIsLoading(false);
-  //   }, 1500);
-  // };
 
   const menuItems = [
     { id: "dashboard", icon: LayoutDashboard, label: "대시보드" },
@@ -175,21 +118,23 @@ export default function Home() {
         }`}
       >
         
-        {/* 사용자 정보 */}
+        {/* 사용자 정보 (로그인 정보 연동) */}
         <div className="pt-6 px-4 pb-4 border-t border-slate-800">
           <div className="flex items-center gap-3 px-4 py-3 rounded-lg bg-slate-800">
-            <div className="w-10 h-10 rounded-full bg-gradient-to-br from-emerald-500 to-teal-600 flex items-center justify-center">
-              <span className="text-sm font-bold">U</span>
+            <div className="w-10 h-10 rounded-full bg-gradient-to-br from-emerald-500 to-teal-600 flex items-center justify-center text-white">
+               {/* 유저 이름의 첫 글자 표시 */}
+              <span className="text-sm font-bold">{user.username.charAt(0).toUpperCase()}</span>
             </div>
             <div className="flex-1 min-w-0">
-              <p className="text-sm font-semibold truncate">사용자</p>
-              <p className="text-xs text-slate-400 truncate">user@gachon.ac.kr</p>
+              {/* [수정] 실제 로그인한 유저 정보 표시 */}
+              <p className="text-sm font-semibold truncate">{user.username}</p>
+              <p className="text-xs text-slate-400 truncate">{user.email}</p>
             </div>
           </div>
         </div>
 
         {/* 메뉴 */}
-        <nav className="flex-1 p-4">
+        <nav className="flex-1 p-4 flex flex-col justify-between">
           <ul className="space-y-2">
             {menuItems.map((item) => {
               const Icon = item.icon;
@@ -213,26 +158,38 @@ export default function Home() {
               );
             })}
           </ul>
+
+          {/* [추가] 로그아웃 버튼 (사이드바 하단) */}
+          <div className="pt-4 border-t border-slate-800 mt-4">
+            <button
+              onClick={() => setUser(null)} // 유저 상태 초기화 -> 로그인 페이지로 이동
+              className="w-full flex items-center gap-3 px-4 py-3 rounded-lg text-slate-400 hover:bg-red-900/20 hover:text-red-400 transition-colors"
+            >
+              <LogOut size={20} />
+              <span className="font-medium">로그아웃</span>
+            </button>
+          </div>
         </nav>
       </aside>
 
       {/* 메인 컨텐츠 */}
-      <main className="flex-1 overflow-auto">
-        {/* 상단 서비스 타이틀 */}
+      <main className="flex-1 overflow-auto custom-scrollbar">
+        {/* 상단 서비스 타이틀 (XtockXignal 로고) */}
         <div className="w-full text-center mt-6">
-          <h1 className="inline-flex items-center gap-2 font-extrabold">
-            <span className="text-8xl leading-none">X</span>
+          <h1 className="inline-flex items-center gap-2 font-extrabold select-none">
+            <span className="text-8xl leading-none bg-clip-text text-transparent bg-gradient-to-br from-blue-500 to-purple-600">X</span>
             <div className="flex flex-col text-left leading-tight">
-              <span className="text-4xl">tock</span>
-              <span className="text-4xl">ignal</span>
+              <span className="text-4xl text-white">tock</span>
+              <span className="text-4xl text-slate-500">ignal</span>
             </div>
           </h1>
         </div>
+
         <div className="max-w-7xl mx-auto px-4 py-10 lg:px-8">
           {/* 헤더 */}
-          <header className="mb-5">
+          <header className="mb-8">
             <div className="flex items-center justify-between mb-2">
-              <h1 className="text-3xl md:text-4xl font-extrabold">
+              <h1 className="text-3xl md:text-4xl font-extrabold text-white">
                 {activeMenu === "dashboard" && "메인 대시보드"}
                 {activeMenu === "recent" && "최근 기업 근황"}
                 {activeMenu === "historical" && "과거 영향 분석"}
@@ -240,7 +197,7 @@ export default function Home() {
                 {activeMenu === "portfolio" && "내 포트폴리오"}
                 {activeMenu === "settings" && "설정"}
               </h1>
-              <p className="text-sm text-slate-400">
+              <p className="text-sm text-slate-400 font-medium">
                 {todayDate}
               </p>
             </div>
@@ -255,17 +212,14 @@ export default function Home() {
           </header>
 
           {/* 메뉴별 컨텐츠 */}
-          {activeMenu === "dashboard" && <DashboardSection />}
-
-          {activeMenu === "recent" && <RecentStatusSection />}
-
-          {activeMenu === "historical" && <HistoricalImpactSection />}
-
-          {activeMenu === "learn" && <LearningCenter />}
-
-          {activeMenu === "portfolio" && <PortfolioSection />}
-
-          {activeMenu === "settings" && <SettingsSection />}
+          <div className="animate-fade-in">
+            {activeMenu === "dashboard" && <DashboardSection />}
+            {activeMenu === "recent" && <RecentStatusSection />}
+            {activeMenu === "historical" && <HistoricalImpactSection />}
+            {activeMenu === "learn" && <LearningCenter />}
+            {activeMenu === "portfolio" && <PortfolioSection />}
+            {activeMenu === "settings" && <SettingsSection />}
+          </div>
         </div>
       </main>
 
